@@ -1,1 +1,22 @@
-
+server:
+  port: 1111
+spring:
+  profiles:
+    active: local
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:./h2database/data
+    username: sa
+    password: 123456
+    data: classpath:db/init.sql
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+    database: h2
