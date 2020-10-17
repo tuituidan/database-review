@@ -1,7 +1,7 @@
 HELP.md
 target/
 .mvn
-application-local.yml
+application-*.yml
 mvnw
 mvnw.cmd
 ### STS ###

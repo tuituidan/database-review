@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>脚本规范检查-配置</title>
+  <link rel="stylesheet" href="css/zui.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/jquery.js"></script>
+  <script src="js/zui.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <nav class="navbar navbar-fixed-top navbar-inverse">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand">数据库规范检查</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a>配置</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="https://github.com/tuituidan/database-review" target="_blank" data-toggle="tooltip">
+              <i class="icon icon-github icon-2x"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="container-first">
+      <!--            <div class="alert alert-warning with-icon">-->
+      <!--                <i class="icon-frown"></i>-->
+      <!--                <div class="content"><strong>正在努力开发中!</strong></div>-->
+      <!--            </div>-->
+    </div>
+    <div class="col-sm-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <span class="panel-title">基础配置</span>
+        </div>
+        <div class="panel-body">
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2">定时任务</label>
+              <div class="col-sm-3">
+                <div class="switch">
+                  <input type="checkbox" v-model="setting.auto" @change="updateAuto"/>
+                  <label>&nbsp;</label>
+                </div>
+              </div>
+              <label class="col-sm-2">计划任务表达式</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" v-model="setting.cron" @change="updateCron"
+                       placeholder="请输入cron"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-2">要检查的模式</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" v-model="setting.schemas"
+                       @change="updateSchemas"
+                       placeholder="请输入要检查的模式，英文逗号隔开"/>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <span class="panel-title">规范配置</span>
+          <a class="btn-panel" @click="editRule()">
+            <i class="icon icon-plus icon-2x"></i>
+          </a>
+        </div>
+        <table class="table table-hover table-bordered table-striped">
+          <thead>
+          <tr>
+            <th>规则描述</th>
+            <th>规则表达式</th>
+            <th>提示消息模版</th>
+            <th style="width: 70px">状态</th>
+            <th style="width: 115px">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-if="!rules.datas.length">
+            <td class="no-data" colspan="5" v-text="'暂无数据'"></td>
+          </tr>
+          <tr v-for="item in rules.datas">
+            <td style="word-break: break-all" v-text="item.desc" :title="item.desc"></td>
+            <td style="word-break: break-all" v-text="item.exp" :title="item.exp"></td>
+            <td style="word-break: break-all" v-text="item.msg" :title="item.msg"></td>
+            <td>
+              <div class="switch">
+                <input type="checkbox" @change="ruleValidChange(item)" :checked="item.valid">
+                <label>&nbsp;</label>
+              </div>
+            </td>
+            <td>
+              <a @click="editRule(item)">
+                <i class="icon icon-edit icon-2x text-primary"></i>
+              </a>
+              <a style="margin-left: 10px" @click="deleteRule(item.id)">
+                <i class="icon icon-trash icon-2x text-red"></i>
+              </a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="ruleModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+              class="sr-only">关闭</span></button>
+          <h4 class="modal-title" v-text="rules.editItem.id?'编辑规则':'新增规则'"></h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-md-2">规则描述</label>
+              <div class="col-md-10">
+                <textarea v-model="rules.editItem.desc" class="form-control" placeholder="请输入规则描述"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-2">规则表达式</label>
+              <div class="col-md-10">
+                <textarea v-model="rules.editItem.exp" class="form-control" placeholder="请输入规则表达式"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-2">提示消息模版</label>
+              <div class="col-md-10">
+                <textarea v-model="rules.editItem.msg" class="form-control" placeholder="请输入提示消息模版"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" @click="saveRule">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/vue.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/util.js"></script>
+<script type="text/javascript">
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                rules: {
+                    datas: [],
+                    editItem: {}
+                },
+                setting: {}
+            }
+        },
+        methods: {
+            loadSetting() {
+                axios.get("/api/v1/setting")
+                .then(res => {
+                    this.setting = {...res};
+                });
+            },
+            loadRuleList() {
+                axios.get("/api/v1/rule")
+                .then(res => {
+                    this.rules.datas = [...res];
+                });
+            },
+            updateAuto() {
+                this.updateSetting('auto', this.setting.auto);
+            },
+            updateCron() {
+                this.updateSetting('cron', encodeURIComponent(encodeURIComponent(this.setting.cron)));
+            },
+            updateSchemas() {
+                this.updateSetting('schemas', this.setting.schemas);
+            },
+            updateSetting(type, val) {
+                axios.patch(`/api/v1/setting/${type}/${val}`)
+                .then(() => {
+                    tip.suc('修改成功');
+                });
+            },
+            editRule(item) {
+                this.rules.editItem = {...item} || {};
+                $('#ruleModal').modal();
+            },
+            ruleValidChange(item) {
+                const msg = item.valid ? '禁用' : '启用';
+                axios.patch(`/api/v1/rule/${item.id}/${!item.valid}`)
+                .then(() => {
+                    tip.suc(`已${msg}`);
+                    this.loadRuleList();
+                });
+            },
+            saveRule() {
+                const params = {...this.rules.editItem};
+                const promise = this.rules.editItem.id ?
+                    axios.patch(`/api/v1/rule/${this.rules.editItem.id}`, params)
+                    : axios.post('/api/v1/rule', params);
+                promise.then(() => {
+                    tip.suc('保存成功');
+                    $('#ruleModal').modal('hide');
+                    this.loadRuleList();
+                })
+            },
+            deleteRule(id) {
+                window.confirm('确定要删除此规则？', () => {
+                    axios.delete(`/api/v1/rule/${id}`)
+                    .then(() => {
+                        tip.suc('删除成功');
+                        this.loadRuleList();
+                    });
+                });
+            }
+        },
+        mounted() {
+            this.loadRuleList();
+            this.loadSetting();
+        }
+    });
+</script>
+</body>
+</html>
