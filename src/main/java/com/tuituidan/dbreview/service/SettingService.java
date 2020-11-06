@@ -19,6 +19,12 @@ public class SettingService {
 
     @Resource
     private SettingRepository settingRepository;
+
+    /**
+     * get.
+     *
+     * @return Setting
+     */
     public Setting get() {
         return settingRepository.findById(1).orElseThrow(NullPointerException::new);
     }
