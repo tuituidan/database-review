@@ -1,0 +1,26 @@
+/*
+ * @author zhujunhan
+ * @date 2020/12/11
+ */
+.layout{
+  border: 1px solid #d7dde4;
+  background: #f5f7f9;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ivu-collapse-content{
+  padding: 0;
+}
+.ivu-collapse-content>.ivu-collapse-content-box{
+  padding: 0;
+}
+.ivu-collapse>.ivu-collapse-item>.ivu-collapse-header{
+  color: #17233d;
+  height: 48px;
+  line-height: 48px;
+  font-size: 16px;
+}
+.layout-footer-center{
+  text-align: center;
+}
