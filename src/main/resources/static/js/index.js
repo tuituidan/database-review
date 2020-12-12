@@ -5,25 +5,27 @@
 new Vue({
     el: '#app',
     data: {
-        visible: false,
-        value2: '1',
-        dvalue: false,
-        columns1: [
+        showHistory: false,
+        columns: [
             {
                 title: '字段',
-                slot: 'field'
+                slot: 'column'
             },
             {
                 title: '字段名',
-                key: 'fieldName'
+                key: 'columnDesc'
             },
             {
                 title: '数据类型',
-                key: 'fieldType'
+                key: 'columnType'
             },
             {
-                title: '说明',
-                key: 'remark'
+                title: '数据长度',
+                key: 'columnLength'
+            },
+            {
+                title: '数据精度',
+                key: 'columnPoint'
             },
             {
                 title: '操作',
@@ -32,53 +34,35 @@ new Vue({
                 align: 'center'
             }
         ],
-        noindex: ['C_BH', 'C_AH', 'C_BH_AJ', 'DT_CJSJ', 'DT_ZHGXSJ'],
-        data1: [
-            {
-                field: 'C_BH',
-                fieldName: '主键',
-                fieldType: 'VC(32)',
-                remark: '主键,UUID'
-            },
-            {
-                field: 'C_AH',
-                fieldName: '案号',
-                fieldType: 'VC(300)',
-                remark: '案号'
-            },
-            {
-                field: 'C_BH_AJ',
-                fieldName: '案件编号',
-                fieldType: 'VC(32)',
-                remark: '案件编号'
-            },
-            {
-                field: 'C_AJMC',
-                fieldName: '案件名称',
-                fieldType: 'VC(300)',
-                remark: '案件编号'
-            },
-            {
-                field: 'C_JBFY',
-                fieldName: '经办法院',
-                fieldType: 'VC(100)',
-                remark: '经办法院'
-            },
-            {
-                field: 'DT_CJSJ',
-                fieldName: '创建时间',
-                fieldType: 'DT',
-                remark: '增量字段'
-            },
-            {
-                field: 'DT_ZHGXSJ',
-                fieldName: '最后更新时间',
-                fieldType: 'DT',
-                remark: '增量字段'
-            }
-        ]
+        datas: [],
+        selectSchema: '',
+        schemas: []
+    },
+    mounted() {
+        this.init();
     },
     methods: {
+        init() {
+            axios.get(`/api/v1/schema`)
+                .then(res => {
+                    this.schemas = res.data;
+                    this.changeSchema(this.schemas[0])
+                })
+                .finally(() => {
+
+                });
+        },
+        changeSchema(schema) {
+            this.selectSchema = schema;
+            this.$Spin.show();
+            axios.get(`/api/v1/schema/${this.selectSchema}/tables`)
+                .then(res => {
+                    this.datas = res.data;
+                })
+                .finally(() => {
+                    this.$Spin.hide();
+                });
+        },
         show(index) {
             alert('show-' + index);
             this.$Modal.info({
@@ -88,6 +72,12 @@ new Vue({
         },
         remove(index) {
             alert('rm-' + index);
+        },
+        clickHandler() {
+            alert('click');
+        },
+        openModal(bh) {
+            this.$refs.tableModal.open(bh);
         }
     }
 });

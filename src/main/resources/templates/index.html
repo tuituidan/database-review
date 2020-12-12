@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <title>数据库设计</title>
+    <link type="text/css" rel="stylesheet" th:href="@{/lib/iview/iview.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+<body>
+<div v-cloak id="app">
+    <Drawer title="操作历史" placement="right" :closable="false" v-model="showHistory">
+        <p>新增表-t_rw</p>
+        <p>新增字段-t_ry-</p>
+        <p>删除表字段</p>
+    </Drawer>
+    <div class="layout">
+        <Layout>
+            <i-header>
+                <Dropdown>
+                    <a href="javascript:void(0)" style="color: white;font-size: 16px;">
+                        <span v-text="selectSchema"></span>
+                        <Icon type="ios-arrow-down"></Icon>
+                    </a>
+                    <dropdown-menu slot="list">
+                        <dropdown-item v-for="item in schemas" v-text="item" @click.native ="changeSchema(item)"></dropdown-item>
+                    </dropdown-menu>
+                </Dropdown>
+                <span style="margin-left: 15px;font-size: 16px;color: white">当前版本-V1.0</span>
+            </i-header>
+            <i-content :style="{margin: '78px 200px'}">
+                <div style="overflow: hidden;">
+                    <div style="float: left">
+                        <i-button type="success" icon="md-add" @click="openModal()">新建表</i-button>
+                    </div>
+                    <div style="float: right">
+                        <i-button icon="md-time" @click="showHistory = true">操作历史</i-button>
+                        <i-button type="primary" icon="md-checkmark">提交审批</i-button>
+                    </div>
+                </div>
+                <Collapse accordion :style="{marginTop: '15px'}">
+                    <Panel v-for="(item,index) in datas" :name="item.table">
+                        <span v-text="item.tableDesc+'（'+item.table+'）'"></span>
+                        <div style="position: absolute;right: 10px;top: 0;">
+                            <i-button type="success" icon="md-add-circle" @click.stop="clickHandler()">新增字段</i-button>
+                            <i-button type="primary" icon="md-copy" @click.stop="clickHandler()">复制表</i-button>
+                            <i-button type="info" icon="ios-cafe" @click.stop="clickHandler()">生成实体类</i-button>
+                            <i-button type="error" icon="md-close" @click.stop="clickHandler()">删除表</i-button>
+                        </div>
+                        <i-table slot="content" stripe :columns="columns" :data="item.columns">
+                            <template slot-scope="{ row }" slot="column">
+                                <span>{{row.column}}</span>
+                                <span title="主键" v-if="row.primaryKey"><Icon type="ios-key" size="24" color="gold"/></span>
+                                <Tag color="warning" closable v-else-if="row.uniqueIndex">唯一索引</Tag>
+                                <Tag color="warning" closable v-else-if="row.index">索引</Tag>
+                            </template>
+                            <template slot-scope="{ row, index }" slot="action">
+                                <Dropdown v-if="!(row.primaryKey||row.uniqueIndex||row.index)">
+                                    <i-button type="warning" size="small">
+                                        标记
+                                        <Icon type="ios-arrow-down"></Icon>
+                                    </i-button>
+                                    <dropdown-menu slot="list">
+                                        <dropdown-item>普通索引</dropdown-item>
+                                        <dropdown-item>唯一索引</dropdown-item>
+                                    </dropdown-menu>
+                                </Dropdown>
+                                <i-button type="primary" size="small" style="margin-right: 5px"
+                                          @click="openModal(index)">编辑
+                                </i-button>
+                                <i-button type="error" size="small" @click="remove(index)">删除</i-button>
+                            </template>
+                        </i-table>
+                    </Panel>
+                </Collapse>
+            </i-content>
+        </Layout>
+    </div>
+    <table-modal ref="tableModal"></table-modal>
+</div>
+<script type="text/javascript" th:src="@{/lib/vue.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/iview/iview.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/axios.min.js}"></script>
+<div th:replace="components/table-modal::table_modal"></div>
+<script type="text/javascript" th:src="@{/js/index.js}"></script>
+</body>
+</html>

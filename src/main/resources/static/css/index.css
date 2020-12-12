@@ -3,11 +3,20 @@
  * @date 2020/12/11
  */
 .layout{
-  border: 1px solid #d7dde4;
-  background: #f5f7f9;
   position: relative;
-  border-radius: 4px;
   overflow: hidden;
+}
+.ivu-layout{
+  background-color: white;
+}
+.ivu-layout-header{
+  position: fixed;
+  width: 100%;
+  z-index: 9;
+}
+
+.ivu-collapse .ivu-collapse-content .ivu-table-wrapper {
+  overflow: visible;
 }
 .ivu-collapse-content{
   padding: 0;
@@ -20,7 +29,11 @@
   height: 48px;
   line-height: 48px;
   font-size: 16px;
+  font-weight: bold;
 }
 .layout-footer-center{
   text-align: center;
+}
+[v-cloak]{
+  display: none;
 }
