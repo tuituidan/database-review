@@ -64,21 +64,32 @@ new Vue({
             }
             location.href = '/' + schema;
         },
-        show(index) {
-            alert('show-' + index);
-            this.$Modal.info({
-                title: 'User Info',
-                content: `11111`
-            })
-        },
         remove(index) {
-            alert('rm-' + index);
+            this.$Message.info('删除字段');
+        },
+        removeTable(){
+            this.$Modal.confirm({
+                title: '确认',
+                content: '<p>确认删除此表？</p>',
+                onOk: () => {
+                    this.$Message.info('删除表');
+                },
+                onCancel: () => {
+
+                }
+            });
         },
         clickHandler() {
-            alert('click');
+            this.$Message.info('响应点击事件');
         },
-        openModal(bh) {
-            this.$refs.tableModal.open(bh);
+        openTableModal(bh, copy) {
+            this.$refs.tableModal.open(bh, copy);
+        },
+        openColumnModal(bh) {
+            this.$refs.columnModal.open(bh);
+        },
+        openApprovalPrevModal() {
+            this.$refs.approvalPrevModal.open();
         }
     }
 });

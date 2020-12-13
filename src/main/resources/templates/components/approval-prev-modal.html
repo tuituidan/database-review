@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="approval-prev-modal">
+    <template id="approval-prev-modal">
+        <Modal v-model="show"
+               title="sql确认"
+               :loading="true"
+               @on-ok="save"
+               ok-text="提交审核"
+               width="700"
+               @on-cancel="cancel">
+            <div>
+                <i-input type="textarea" readonly  :rows="25" placeholder="生成确认sql" />
+            </div>
+        </Modal>
+    </template>
+    <script type="text/javascript">
+        Vue.component('approval-prev-modal', {
+            template: '#approval-prev-modal',
+            data() {
+                return {
+                    show: false
+                }
+            },
+            methods: {
+                open() {
+                    this.show = true;
+                },
+                save() {
+                    setTimeout(() => {
+                        this.close();
+                    }, 2000);
+                },
+                cancel() {
+                    //this.close();
+                },
+                close(){
+                    this.show = false;
+                }
+            }
+        })
+    </script>
+</div>

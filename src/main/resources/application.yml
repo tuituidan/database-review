@@ -21,5 +21,10 @@ spring:
 exclude-db:
   schemas:
     - public
+    - information_schema
+    - pg_catalog
+    - pg_toast_temp_1
+    - pg_temp_1
+    - pg_toast
   tables:
     - temp

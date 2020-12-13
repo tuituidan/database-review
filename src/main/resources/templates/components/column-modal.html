@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="column-modal">
+    <template id="column-modal">
+        <Modal v-model="show"
+               :title="edit?'编辑字段':'新增字段'"
+               :loading="true"
+               @on-ok="save"
+               @on-cancel="cancel">
+            <i-form ref="columnForm" :model="editItem" :label-width="80" @submit.native.prevent>
+                <form-item label="字段名" prop="columnName" required>
+                    <i-input v-model="editItem.columnName"/>
+                </form-item>
+                <form-item label="字段说明" prop="columnDesc" required>
+                    <i-input v-model="editItem.columnDesc"/>
+                </form-item>
+                <form-item label="字段类型" prop="columnType" required>
+                    <i-select v-model="editItem.columnType">
+                        <i-option v-for="item in columnTypes" :value="item" :key="item">{{ item }}</i-option>
+                    </i-select>
+                </form-item>
+            </i-form>
+        </Modal>
+    </template>
+    <script type="text/javascript">
+        Vue.component('column-modal', {
+            template: '#column-modal',
+            data() {
+                return {
+                    edit: false,
+                    show: false,
+                    editItem: {
+                        columnName: '',
+                        columnDesc: '',
+                        columnType: ''
+                    },
+                    columnTypes: ['C(32)','VC(100)','VC(300)','VC(600)','VC(900)','CLOB','INT','N(20,4)','D','DT']
+                }
+            },
+            methods: {
+                open(bh) {
+                    this.edit = Boolean(bh);
+                    this.show = true;
+                },
+                save() {
+                    setTimeout(() => {
+                        this.close();
+                    }, 2000);
+                },
+                cancel() {
+                    //this.close();
+                },
+                close(){
+                    this.show = false;
+                }
+            }
+        })
+    </script>
+</div>
+

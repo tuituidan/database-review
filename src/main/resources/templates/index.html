@@ -10,43 +10,81 @@
 <body>
 <div v-cloak id="app">
     <Drawer title="操作历史" placement="right" :closable="false" v-model="showHistory">
-        <p>新增表-t_rw</p>
-        <p>新增字段-t_ry-</p>
-        <p>删除表字段</p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <timeline>
+            <timeline-item color="green">新增表【t_rw】</timeline-item>
+            <timeline-item color="green">新增字段【t_ry.c_bh_gx】</timeline-item>
+            <timeline-item color="red">删除表字段【t_ry.c_bh_gx】</timeline-item>
+            <timeline-item color="red">删除表【t_dw】</timeline-item>
+            <timeline-item color="red">表字段改名【t_ry.c_bh_gx】->【t_ry.c_bh_xx】</timeline-item>
+            <timeline-item color="blue">表字段【t_ry.c_bh_gx】改名【案件编号】->【编号案件】</timeline-item>
+        </timeline>
     </Drawer>
     <div class="layout">
         <Layout>
             <i-header>
-                <span style="font-size: 16px;color: white">模式：</span>
-                <Dropdown>
-                    <a href="javascript:void(0)" style="color: white;font-size: 16px;">
-                        <span v-text="selectSchema"></span>
-                        <Icon type="ios-arrow-down"></Icon>
-                    </a>
-                    <dropdown-menu slot="list">
-                        <dropdown-item v-for="item in schemas" v-text="item" @click.native ="changeSchema(item)"></dropdown-item>
-                    </dropdown-menu>
-                </Dropdown>
+                <div style="overflow: hidden;padding: 0 150px;">
+                    <div style="float: left;">
+                        <span style="font-size: 16px;color: white;">模式：</span>
+                        <Dropdown transfer>
+                            <a href="javascript:void(0)" style="color: white;font-size: 16px;">
+                                <span v-text="selectSchema"></span>
+                                <Icon type="ios-arrow-down"></Icon>
+                            </a>
+                            <dropdown-menu slot="list">
+                                <dropdown-item v-for="item in schemas" v-text="item" @click.native ="changeSchema(item)"></dropdown-item>
+                            </dropdown-menu>
+                        </Dropdown>
+                    </div>
+                    <div style="float: right;">
+                        <Avatar src="image/avatar.jpg" size="45" />
+                    </div>
+                </div>
             </i-header>
             <i-content :style="{margin: '78px 200px'}">
                 <div style="overflow: hidden;">
                     <div style="float: left">
-
+                        <i-button type="success" icon="md-add" @click="openTableModal()">新建表</i-button>
+                        <i-button type="primary" icon="md-checkmark" @click="openApprovalPrevModal()">提交审核</i-button>
                     </div>
                     <div style="float: right">
-                        <i-button type="success" icon="md-add" @click="openModal()">新建表</i-button>
+                        <i-button type="success" ghost icon="md-cloud-download" @click="clickHandler()">导出SMD</i-button>
+                        <i-button type="info" icon="md-cloud-upload" ghost @click="clickHandler()">导入SMD</i-button>
                         <i-button icon="md-time" @click="showHistory = true">操作历史</i-button>
-                        <i-button type="primary" icon="md-checkmark">提交审批</i-button>
                     </div>
                 </div>
-                <Collapse accordion :style="{marginTop: '15px'}">
+                <div v-if="datas.length===0" style="text-align: center;padding-top: 100px;">
+                    <div>
+                        <img src="image/no-data.jpg" alt="没有数据"/>
+                    </div>
+                    <div>暂无数据</div>
+                </div>
+                <Collapse v-if="datas.length!==0" accordion :style="{marginTop: '15px'}">
                     <Panel v-for="(item,index) in datas" :name="item.table">
                         <span v-text="item.tableDesc+'（'+item.table+'）'"></span>
                         <div style="position: absolute;right: 10px;top: 0;">
-                            <i-button type="success" icon="md-add-circle" @click.stop="clickHandler()">新增字段</i-button>
-                            <i-button type="primary" icon="md-copy" @click.stop="clickHandler()">复制表</i-button>
-                            <i-button type="info" icon="ios-cafe" @click.stop="clickHandler()">生成实体类</i-button>
-                            <i-button type="error" icon="md-close" @click.stop="clickHandler()">删除表</i-button>
+                            <i-button type="success" icon="md-add-circle" @click.stop="openColumnModal()">新增字段</i-button>
+                            <i-button type="primary" icon="md-create" @click.stop="openTableModal(item.table)">编辑表</i-button>
+                            <i-button type="info" icon="md-copy" @click.stop="openTableModal(item.table, true)">复制表</i-button>
+                            <i-button type="error" icon="md-close" @click.stop="removeTable()">删除表</i-button>
+                            <Poptip trigger="hover" placement="right" padding="0">
+                                <i-button type="primary" icon="ios-cafe" ghost>其他操作</i-button>
+                                <div slot="content">
+                                    <button-group vertical>
+                                        <i-button type="primary" ghost  @click.stop="clickHandler()">生成实体类</i-button>
+                                        <i-button type="primary" ghost  @click.stop="clickHandler()">生成mybatis-xml</i-button>
+                                    </button-group>
+                                </div>
+                            </Poptip>
+<!--                            <Dropdown placement="right">-->
+<!--                                <i-button type="primary" ghost>其他操作<Icon type="ios-arrow-forward" /></i-button>-->
+<!--                                <dropdown-menu slot="list">-->
+<!--                                    <dropdown-item @click.native ="clickHandler()">生成实体类</dropdown-item>-->
+<!--                                    <dropdown-item @click.native ="clickHandler()">生成mybatis-xml</dropdown-item>-->
+<!--                                </dropdown-menu>-->
+<!--                            </Dropdown>-->
                         </div>
                         <i-table slot="content" stripe :columns="columns" :data="item.columns">
                             <template slot-scope="{ row }" slot="column">
@@ -56,7 +94,7 @@
                                 <Tag color="warning" closable v-else-if="row.index">索引</Tag>
                             </template>
                             <template slot-scope="{ row, index }" slot="action">
-                                <Dropdown v-if="!(row.primaryKey||row.uniqueIndex||row.index)">
+                                <Dropdown transfer v-if="!(row.primaryKey||row.uniqueIndex||row.index)">
                                     <i-button type="warning" size="small">
                                         标记
                                         <Icon type="ios-arrow-down"></Icon>
@@ -67,9 +105,13 @@
                                     </dropdown-menu>
                                 </Dropdown>
                                 <i-button type="primary" size="small" style="margin-right: 5px"
-                                          @click="openModal(index)">编辑
+                                          @click="openColumnModal(index)">编辑
                                 </i-button>
-                                <i-button type="error" size="small" @click="remove(index)">删除</i-button>
+                                <Poptip confirm transfer
+                                        title="您确定要删除此字段吗？"
+                                        @on-ok="remove(index)">
+                                    <i-button type="error" size="small">删除</i-button>
+                                </Poptip>
                             </template>
                         </i-table>
                     </Panel>
@@ -78,11 +120,15 @@
         </Layout>
     </div>
     <table-modal ref="tableModal"></table-modal>
+    <column-modal ref="columnModal"></column-modal>
+    <approval-prev-modal ref="approvalPrevModal"></approval-prev-modal>
 </div>
 <script type="text/javascript" th:src="@{/lib/vue.min.js}"></script>
 <script type="text/javascript" th:src="@{/lib/iview/iview.min.js}"></script>
 <script type="text/javascript" th:src="@{/lib/axios.min.js}"></script>
-<div th:replace="components/table-modal::table_modal"></div>
+<div th:replace="components/table-modal::table-modal"></div>
+<div th:replace="components/column-modal::column-modal"></div>
+<div th:replace="components/approval-prev-modal::approval-prev-modal"></div>
 <script type="text/javascript" th:inline="javascript">
     const curSchema = /*[[${schema}]]*/ '';
 </script>
