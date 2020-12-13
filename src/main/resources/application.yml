@@ -16,3 +16,10 @@ spring:
     generate-ddl: true
   thymeleaf:
     cache: false
+
+# 配置需要排除的模式和表
+exclude-db:
+  schemas:
+    - public
+  tables:
+    - temp

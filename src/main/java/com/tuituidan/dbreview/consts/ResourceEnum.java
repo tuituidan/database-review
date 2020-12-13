@@ -13,8 +13,9 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.StreamUtils;
 
 /**
- * 读取classpath的下的配置，支持string和properties两种<br/>.
- * 只需要配置classpath路径和返回类型即可.
+ * 读取classpath的下的配置，支持string和properties两种<br/>
+ * 只需要配置classpath路径和返回类型即可<br/>
+ * 如果不经常使用的还是不要放这里，常驻内存.
  *
  * @author tuituidan
  * @version 1.0

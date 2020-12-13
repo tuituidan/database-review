@@ -35,7 +35,7 @@ new Vue({
             }
         ],
         datas: [],
-        selectSchema: '',
+        selectSchema: curSchema,
         schemas: []
     },
     mounted() {
@@ -43,25 +43,26 @@ new Vue({
     },
     methods: {
         init() {
+            if (curSchema) {
+                this.$Spin.show();
+                axios.get(`/api/v1/schema/${curSchema}/tables`)
+                    .then(res => {
+                        this.datas = res.data;
+                    })
+                    .finally(() => {
+                        this.$Spin.hide();
+                    });
+            }
             axios.get(`/api/v1/schema`)
                 .then(res => {
                     this.schemas = res.data;
-                    this.changeSchema(this.schemas[0])
-                })
-                .finally(() => {
-
                 });
         },
         changeSchema(schema) {
-            this.selectSchema = schema;
-            this.$Spin.show();
-            axios.get(`/api/v1/schema/${this.selectSchema}/tables`)
-                .then(res => {
-                    this.datas = res.data;
-                })
-                .finally(() => {
-                    this.$Spin.hide();
-                });
+            if (schema === this.selectSchema) {
+                return;
+            }
+            location.href = '/' + schema;
         },
         show(index) {
             alert('show-' + index);

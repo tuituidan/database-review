@@ -3,7 +3,7 @@
 <div th:fragment="table_modal">
     <template id="table-modal">
         <Modal v-model="show"
-               :title="edit?'编辑表':'创建表'"
+               :title="edit?'复制表':'创建表'"
                :loading="true"
                @on-ok="save"
                @on-cancel="cancel">

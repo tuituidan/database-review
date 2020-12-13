@@ -4,6 +4,7 @@ import com.tuituidan.dbreview.bean.vo.ColumnInfo;
 import com.tuituidan.dbreview.bean.vo.DbInfo;
 import com.tuituidan.dbreview.bean.vo.IndexInfo;
 import com.tuituidan.dbreview.bean.vo.TableInfo;
+import com.tuituidan.dbreview.config.ExcludeDbConfig;
 import com.tuituidan.dbreview.consts.ResourceEnum;
 import com.tuituidan.dbreview.util.BeanExtUtils;
 
@@ -36,14 +37,25 @@ public class DataBaseService {
     @Resource
     private JdbcTemplate jdbcTemplate;
 
+    @Resource
+    private ExcludeDbConfig excludeDbConfig;
+
     public List<String> selectSchemas() {
-        return jdbcTemplate.queryForList(ResourceEnum.SCHEMA_SQL.getStr(), String.class);
+        List<String> schemas = jdbcTemplate.queryForList(ResourceEnum.SCHEMA_SQL.getStr(), String.class);
+        schemas.removeAll(excludeDbConfig.getSchemas());
+        return schemas;
     }
 
 
     public Collection<TableInfo> selectList(String schema) {
         List<DbInfo> dbInfoList = jdbcTemplate.query(ResourceEnum.COLUMN_SQL.getStr(),
                 new BeanPropertyRowMapper<>(DbInfo.class), schema);
+        dbInfoList = dbInfoList.stream().filter(item ->
+                !excludeDbConfig.getTables().contains(item.getTable())
+        ).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(dbInfoList)) {
+            return Collections.emptyList();
+        }
         List<IndexInfo> indexInfoList = jdbcTemplate.query(ResourceEnum.INDEX_SQL.getStr(),
                 new BeanPropertyRowMapper<>(IndexInfo.class), schema);
         if (CollectionUtils.isEmpty(indexInfoList)) {

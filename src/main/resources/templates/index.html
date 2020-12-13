@@ -17,6 +17,7 @@
     <div class="layout">
         <Layout>
             <i-header>
+                <span style="font-size: 16px;color: white">模式：</span>
                 <Dropdown>
                     <a href="javascript:void(0)" style="color: white;font-size: 16px;">
                         <span v-text="selectSchema"></span>
@@ -26,14 +27,14 @@
                         <dropdown-item v-for="item in schemas" v-text="item" @click.native ="changeSchema(item)"></dropdown-item>
                     </dropdown-menu>
                 </Dropdown>
-                <span style="margin-left: 15px;font-size: 16px;color: white">当前版本-V1.0</span>
             </i-header>
             <i-content :style="{margin: '78px 200px'}">
                 <div style="overflow: hidden;">
                     <div style="float: left">
-                        <i-button type="success" icon="md-add" @click="openModal()">新建表</i-button>
+
                     </div>
                     <div style="float: right">
+                        <i-button type="success" icon="md-add" @click="openModal()">新建表</i-button>
                         <i-button icon="md-time" @click="showHistory = true">操作历史</i-button>
                         <i-button type="primary" icon="md-checkmark">提交审批</i-button>
                     </div>
@@ -82,6 +83,10 @@
 <script type="text/javascript" th:src="@{/lib/iview/iview.min.js}"></script>
 <script type="text/javascript" th:src="@{/lib/axios.min.js}"></script>
 <div th:replace="components/table-modal::table_modal"></div>
+<script type="text/javascript" th:inline="javascript">
+    const curSchema = /*[[${schema}]]*/ '';
+</script>
 <script type="text/javascript" th:src="@{/js/index.js}"></script>
+
 </body>
 </html>
