@@ -9,23 +9,26 @@
 </head>
 <body>
 <div v-cloak id="app">
-    <Drawer title="操作历史" placement="right" :closable="false" v-model="showHistory">
+    <Drawer width="240" title="操作历史" placement="left" :closable="false" v-model="history.length>0" :mask="false" :mask-closable="false">
         <p></p>
         <p></p>
         <p></p>
         <timeline>
-            <timeline-item color="green">新增表【t_rw】</timeline-item>
-            <timeline-item color="green">新增字段【t_ry.c_bh_gx】</timeline-item>
-            <timeline-item color="red">删除表字段【t_ry.c_bh_gx】</timeline-item>
-            <timeline-item color="red">删除表【t_dw】</timeline-item>
-            <timeline-item color="red">表字段改名【t_ry.c_bh_gx】->【t_ry.c_bh_xx】</timeline-item>
-            <timeline-item color="blue">表字段【t_ry.c_bh_gx】改名【案件编号】->【编号案件】</timeline-item>
+            <timeline-item :key="item" v-for="item in history" :color="item.color">{{item.msg}}</timeline-item>
+        </timeline>
+    </Drawer>
+    <Drawer width="200" title="待粘贴字段" placement="right" @on-close="clearPaste()" v-model="pastes.length>0" :mask="false" :mask-closable="false">
+        <p></p>
+        <p></p>
+        <p></p>
+        <timeline>
+            <timeline-item :key="item" color="green" v-for="item in pastes">{{item}}</timeline-item>
         </timeline>
     </Drawer>
     <div class="layout">
         <Layout>
             <i-header>
-                <div style="overflow: hidden;padding: 0 150px;">
+                <div style="overflow: hidden;padding: 0 210px;">
                     <div style="float: left;">
                         <span style="font-size: 16px;color: white;">模式：</span>
                         <Dropdown transfer>
@@ -43,16 +46,15 @@
                     </div>
                 </div>
             </i-header>
-            <i-content :style="{margin: '78px 200px'}">
+            <i-content :style="{margin: '78px 260px'}">
                 <div style="overflow: hidden;">
                     <div style="float: left">
                         <i-button type="success" icon="md-add" @click="openTableModal()">新建表</i-button>
-                        <i-button type="primary" icon="md-checkmark" @click="openApprovalPrevModal()">提交审核</i-button>
                     </div>
                     <div style="float: right">
-                        <i-button type="success" ghost icon="md-cloud-download" @click="clickHandler()">导出SMD</i-button>
-                        <i-button type="info" icon="md-cloud-upload" ghost @click="clickHandler()">导入SMD</i-button>
-                        <i-button icon="md-time" @click="showHistory = true">操作历史</i-button>
+<!--                        <i-button type="success" ghost icon="md-cloud-download" @click="clickHandler()">导出SMD</i-button>-->
+<!--                        <i-button type="info" icon="md-cloud-upload" ghost @click="clickHandler()">导入SMD</i-button>-->
+                        <i-button type="primary" icon="md-checkmark" @click="openApprovalPrevModal()">提交审核</i-button>
                     </div>
                 </div>
                 <div v-if="datas.length===0" style="text-align: center;padding-top: 100px;">
@@ -67,7 +69,7 @@
                         <div style="position: absolute;right: 10px;top: 0;">
                             <i-button type="success" icon="md-add-circle" @click.stop="openColumnModal()">新增字段</i-button>
                             <i-button type="primary" icon="md-create" @click.stop="openTableModal(item.table)">编辑表</i-button>
-                            <i-button type="info" icon="md-copy" @click.stop="openTableModal(item.table, true)">复制表</i-button>
+                            <i-button type="info" icon="md-copy" @click.stop="pasteToTable()">粘贴字段</i-button>
                             <i-button type="error" icon="md-close" @click.stop="removeTable()">删除表</i-button>
                             <Poptip trigger="hover" placement="right" padding="0">
                                 <i-button type="primary" icon="ios-cafe" ghost>其他操作</i-button>
@@ -112,6 +114,9 @@
                                         @on-ok="remove(index)">
                                     <i-button type="error" size="small">删除</i-button>
                                 </Poptip>
+                                <i-button type="info" size="small" style="margin-right: 5px"
+                                          @click="columnCopy(row)">复制
+                                </i-button>
                             </template>
                         </i-table>
                     </Panel>

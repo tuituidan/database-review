@@ -15,7 +15,7 @@ join pg_catalog.pg_class pc on pc.relname=vu.table_name and pc.relnamespace=pn.o
 join pg_catalog.pg_attribute pa on pc.oid=pa.attrelid and pa.attname=vu.column_name
 where vu.table_name in
 (
-select table_name from information_schema.tables where table_type='BASE TABLE' and table_name like 't_%'
+select table_name from information_schema.tables where table_type='BASE TABLE'
 )
 and vu.table_schema=?
 order by vu.table_schema ,vu.table_name, vu.ordinal_position
